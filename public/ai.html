@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Freepik AI Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #f9f9f9;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .search-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #ddd;
+      border-radius: 50px;
+      padding: 8px 15px;
+      width: 450px;
+      box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+      background: #fff;
+    }
+
+    .search-container input {
+      border: none;
+      outline: none;
+      flex: 1;
+      font-size: 16px;
+      padding: 8px;
+      border-radius: 50px;
+    }
+
+    .search-container button {
+      border: none;
+      background: #4285f4;
+      color: #fff;
+      padding: 8px 15px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    #generatedImages {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-top: 20px;
+      width: 100%;
+      justify-content: center;
+      text-align: center;
+      font-size: 18px;
+      color: #555;
+    }
+
+    .image-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      width: 220px;
+      text-align: center;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 320px; /* Ensures enough space */
+    }
+
+    .image-card img {
+      width: 100%;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+
+    .image-card select,
+    .image-card input {
+      margin: 5px 0;
+      padding: 5px;
+      width: 90%;
+    }
+
+    .buy-btn {
+      background: #ff6600;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 8px; /* Add spacing */
+    }
+
+    .buy-btn:hover {
+      background: #e65c00;
+    }
+  </style>
+</head>
+<body>
+  <h2>Generate AI Image</h2>
+
+  <div class="search-container">
+    <input type="text" id="promptInput" placeholder="e.g. modern blue cricket jersey">
+    <button id="genBtn">Generate</button>
+  </div>
+
+  <div id="generatedImages">Enter a prompt and click Generate.</div>
+
+<script>
+document.getElementById('genBtn').addEventListener('click', async () => {
+  const prompt = document.getElementById('promptInput').value.trim();
+  const container = document.getElementById('generatedImages');
+  if (!prompt) return alert('Enter a prompt first');
+
+  container.innerHTML = '<p>Generating images, please wait...</p>';
+
+  try {
+    const res = await fetch('/api/generate-image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+
+    const data = await res.json();
+    container.innerHTML = '';
+
+    if (data.data && data.data.length) {
+      data.data.forEach(imgObj => {
+        const card = document.createElement('div');
+        card.classList.add('image-card');
+
+        card.innerHTML = `
+          <img src="data:image/jpeg;base64,${imgObj.base64}" alt="AI Image" />
+          <div>
+            <label>Size: </label>
+            <select class="size-select">
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+            </select>
+          </div>
+          <div>
+            <label>Qty: </label>
+            <input type="number" class="qty-input" value="1" min="1">
+          </div>
+          <button class="buy-btn">Buy Now</button>
+        `;
+
+        // Add event listener for Buy Now
+        card.querySelector('.buy-btn').addEventListener('click', () => {
+          const size = card.querySelector('.size-select').value;
+          const qty = card.querySelector('.qty-input').value;
+          buyNow(imgObj.base64, size, qty);
+        });
+
+        container.appendChild(card);
+      });
+    } else {
+      container.textContent = 'No images generated. Try another prompt.';
+    }
+  } catch (err) {
+    console.error(err);
+    container.textContent = 'Error while generating images. Please try again.';
+  }
+});
+
+async function buyNow(imageBase64, size, quantity) {
+  try {
+    const res = await fetch('/api/buy-ai-image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageBase64, size, quantity })
+    });
+
+    const data = await res.json();
+
+    if (data.checkoutUrl) {
+      window.location.href = data.checkoutUrl; // Redirect to Shopify checkout
+    } else {
+      alert('Error while processing your request.');
+    }
+  } catch (err) {
+    console.error('Buy Now Error:', err);
+    alert('Error while processing your request.');
+  }
+}
+
+
+</script>
+</body>
+</html>
