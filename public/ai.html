@@ -142,11 +142,15 @@ document.getElementById('genBtn').addEventListener('click', async () => {
           <div>
             <label>Size: </label>
             <select class="size-select">
-              <option value="S">S</option>
-              <option value="M">M</option>
-              <option value="L">L</option>
-              <option value="XL">XL</option>
-            </select>
+            <option value="XXS">XXS</option>
+            <option value="XS">XS</option>
+            <option value="S">S</option>
+            <option value="M">M</option>
+            <option value="L">L</option>
+            <option value="XL">XL</option>
+            <option value="XXL">XXL</option>
+            <option value="XXXL">XXXL</option>
+          </select>
           </div>
           <div>
             <label>Qty: </label>
@@ -159,7 +163,7 @@ document.getElementById('genBtn').addEventListener('click', async () => {
         card.querySelector('.buy-btn').addEventListener('click', () => {
           const size = card.querySelector('.size-select').value;
           const qty = card.querySelector('.qty-input').value;
-          buyNow(imgObj.base64, size, qty);
+          buyNow(size, qty);
         });
 
         container.appendChild(card);
@@ -173,28 +177,28 @@ document.getElementById('genBtn').addEventListener('click', async () => {
   }
 });
 
-async function buyNow(imageBase64, size, quantity) {
-  try {
-    const res = await fetch('/api/buy-ai-image', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ imageBase64, size, quantity })
-    });
-
-    const data = await res.json();
-
-    if (data.checkoutUrl) {
-      window.location.href = data.checkoutUrl; // Redirect to Shopify checkout
-    } else {
-      alert('Error while processing your request.');
-    }
-  } catch (err) {
-    console.error('Buy Now Error:', err);
-    alert('Error while processing your request.');
+function buyNow(size, quantity) {
+  // Map size to Shopify variant IDs (replace these IDs with your real variant IDs)
+      const variantMap = {
+      XXS: 'VARIANT_ID_FOR_XXS',
+      XS: 'VARIANT_ID_FOR_XS',
+      S: 'VARIANT_ID_FOR_S',
+      M: 'VARIANT_ID_FOR_M',
+      L: 'VARIANT_ID_FOR_L',
+      XL: 'VARIANT_ID_FOR_XL',
+      XXL: 'VARIANT_ID_FOR_XXL',
+      XXXL: 'VARIANT_ID_FOR_XXXL'
+    };
+  const variantId = variantMap[size];
+  if (!variantId) {
+    alert('Invalid size selected.');
+    return;
   }
+
+  // Directly redirect to Shopify checkout
+  window.location.href = `https://nextprint.in/cart/${variantId}:${quantity}`;
 }
-
-
 </script>
+
 </body>
 </html>
