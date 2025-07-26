@@ -87,8 +87,9 @@ app.post('/api/buy-ai-image', async (req, res) => {
             {
               option1: size,
               price: '499.00',
-              inventory_management: 'shopify'
-              // inventory_quantity is set separately if needed
+              inventory_management: 'shopify',
+              inventory_quantity: quantity || 10, 
+              requires_shipping: true
             }
           ],
           options: [{ name: 'Size' }]
