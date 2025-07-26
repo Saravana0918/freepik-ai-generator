@@ -19,11 +19,12 @@ app.use(
     origin: [
       'https://yogireddy.myshopify.com',
       'https://admin.shopify.com',
-      /\.shopifypreview\.com$/,  // Matches all Shopify preview domains
-      'https://nextprint.in'
+      /\.shopifypreview\.com$/,
+      'https://nextprint.in',
+      'https://www.nextprint.in' // Add this!
     ],
     methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
   })
 );
 
