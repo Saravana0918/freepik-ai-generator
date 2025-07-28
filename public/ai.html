@@ -142,22 +142,29 @@ document.getElementById('genBtn').addEventListener('click', async () => {
           <div>
             <label>Size: </label>
             <select class="size-select">
-            <option value="XXS">XXS</option>
-            <option value="XS">XS</option>
-            <option value="S">S</option>
-            <option value="M">M</option>
-            <option value="L">L</option>
-            <option value="XL">XL</option>
-            <option value="XXL">XXL</option>
-            <option value="XXXL">XXXL</option>
-          </select>
+              <option value="XXS">XXS</option>
+              <option value="XS">XS</option>
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+              <option value="XXL">XXL</option>
+              <option value="XXXL">XXXL</option>
+            </select>
           </div>
           <div>
             <label>Qty: </label>
-            <input type="number" class="qty-input" value="1" min="1">
+            <input type="number" class="qty-input" value="1" min="1" max="15">
           </div>
           <button class="buy-btn">Buy Now</button>
         `;
+
+        // Restrict quantity to 1–15
+        const qtyInput = card.querySelector('.qty-input');
+        qtyInput.addEventListener('input', (e) => {
+          if (e.target.value > 15) e.target.value = 15;
+          if (e.target.value < 1) e.target.value = 1;
+        });
 
         // Add event listener for Buy Now
         card.querySelector('.buy-btn').addEventListener('click', () => {
@@ -178,24 +185,21 @@ document.getElementById('genBtn').addEventListener('click', async () => {
 });
 
 function buyNow(size, quantity) {
-  // Map size to Shopify variant IDs (replace these IDs with your real variant IDs)
-      const variantMap = {
-      XXS: 'VARIANT_ID_FOR_XXS',
-      XS: 'VARIANT_ID_FOR_XS',
-      S: 'VARIANT_ID_FOR_S',
-      M: 'VARIANT_ID_FOR_M',
-      L: 'VARIANT_ID_FOR_L',
-      XL: 'VARIANT_ID_FOR_XL',
-      XXL: 'VARIANT_ID_FOR_XXL',
-      XXXL: 'VARIANT_ID_FOR_XXXL'
-    };
+  const variantMap = {
+    XXS: 'VARIANT_ID_FOR_XXS',
+    XS: 'VARIANT_ID_FOR_XS',
+    S: 'VARIANT_ID_FOR_S',
+    M: 'VARIANT_ID_FOR_M',
+    L: 'VARIANT_ID_FOR_L',
+    XL: 'VARIANT_ID_FOR_XL',
+    XXL: 'VARIANT_ID_FOR_XXL',
+    XXXL: 'VARIANT_ID_FOR_XXXL'
+  };
   const variantId = variantMap[size];
   if (!variantId) {
     alert('Invalid size selected.');
     return;
   }
-
-  // Directly redirect to Shopify checkout
   window.location.href = `https://nextprint.in/cart/${variantId}:${quantity}`;
 }
 </script>
